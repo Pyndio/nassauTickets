@@ -1,0 +1,603 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --azul: #0057b8;
+  --azul-escuro: #003b7a;
+  --amarelo: #f5c400;
+  --vermelho: #d71920;
+  --branco: #ffffff;
+  --cinza: #f3f5f8;
+  --cinza-escuro: #e5e9ef;
+  --borda: #d5dce5;
+  --texto: #1f2937;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--cinza);
+  color: var(--texto);
+}
+
+/* =========================
+   NAVEGAÇÃO TEMPORÁRIA
+========================= */
+
+.navegacao-telas {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--azul-escuro);
+}
+
+.navegacao-telas button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 22px;
+  background: var(--branco);
+  color: var(--azul-escuro);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.navegacao-telas button:hover {
+  background: var(--amarelo);
+}
+
+/* =========================
+   TOTEM
+========================= */
+
+.totem {
+  width: 94%;
+  max-width: 1100px;
+  min-height: calc(100vh - 58px);
+  margin: 0 auto;
+  padding: 25px 35px;
+  background: var(--branco);
+  border-left: 7px solid var(--azul);
+  border-right: 7px solid var(--amarelo);
+}
+
+/* TOPO */
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.identidade {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  width: 180px;
+  height: auto;
+}
+
+.nome-sistema {
+  padding-left: 20px;
+  border-left: 2px solid var(--amarelo);
+}
+
+.nome-sistema strong {
+  display: block;
+  color: var(--azul);
+  font-size: 24px;
+}
+
+.nome-sistema span {
+  color: #666;
+  font-size: 14px;
+}
+
+.status-sistema {
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #eef7f0;
+  color: #26733d;
+  font-weight: bold;
+}
+
+/* BOAS-VINDAS */
+
+.boas-vindas {
+  padding: 35px 0 25px;
+  text-align: center;
+}
+
+.boas-vindas h1 {
+  margin: 0 0 10px;
+  color: var(--azul-escuro);
+  font-size: 36px;
+}
+
+.boas-vindas p {
+  margin: 0;
+  color: #666;
+  font-size: 18px;
+}
+
+/* SENHA GERADA */
+
+.senha-gerada {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  text-align: center;
+  border: 2px solid var(--amarelo);
+  border-radius: 20px;
+  background: #fff9d9;
+}
+
+.senha-gerada span,
+.senha-gerada small {
+  display: block;
+  color: #666;
+}
+
+.senha-gerada strong {
+  display: block;
+  margin: 5px 0;
+  color: var(--azul);
+  font-size: 46px;
+}
+
+/* =========================
+   OPÇÕES DE ATENDIMENTO
+========================= */
+
+.opcoes-atendimento {
+  margin-bottom: 35px;
+}
+
+.opcoes-atendimento h2 {
+  margin-bottom: 20px;
+  color: var(--azul-escuro);
+  text-align: center;
+}
+
+.grade-opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grade-opcoes .retirada-exames {
+  grid-column: 1 / 3;
+  width: 50%;
+  justify-self: center;
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  min-height: 170px;
+  padding: 30px;
+  border: 0;
+  border-radius: 24px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.opcao:hover {
+  transform: translateY(-3px);
+}
+
+.opcao:active {
+  transform: scale(0.98);
+}
+
+.opcao-conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.opcao-conteudo strong {
+  font-size: 24px;
+}
+
+.opcao-conteudo small {
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.codigo {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.atendimento-geral {
+  background: var(--azul);
+  color: var(--branco);
+}
+
+.atendimento-preferencial {
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+}
+
+.retirada-exames {
+  background: var(--vermelho);
+  color: var(--branco);
+}
+
+/* =========================
+   GUICHÊ
+========================= */
+
+.guiche {
+  width: 94%;
+  max-width: 1100px;
+  min-height: calc(100vh - 58px);
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.topo-guiche {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  border-radius: 18px;
+  background: var(--branco);
+  border-left: 7px solid var(--azul);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.topo-guiche strong {
+  display: block;
+  color: var(--azul);
+  font-size: 28px;
+}
+
+.topo-guiche span {
+  display: block;
+  margin-top: 5px;
+  color: #666;
+}
+
+.identificacao-guiche {
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+  font-weight: bold;
+}
+
+/* FILA DO GUICHÊ */
+
+.fila-guiche {
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 18px;
+  background: var(--cinza-escuro);
+  border: 1px solid var(--borda);
+}
+
+.fila-guiche h2 {
+  margin-top: 0;
+  color: var(--azul-escuro);
+}
+
+.senha-fila-guiche {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  min-height: 55px;
+  margin: 6px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  background: var(--azul);
+  color: var(--branco);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ATENDIMENTO */
+
+.atendimento-guiche {
+  margin-top: 25px;
+  padding: 30px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.atendimento-guiche h1 {
+  margin-top: 0;
+  color: var(--azul-escuro);
+}
+
+.senha-atual-guiche {
+  margin: 25px auto;
+  padding: 25px;
+  max-width: 500px;
+  border-radius: 20px;
+  background: var(--cinza);
+}
+
+.senha-atual-guiche span,
+.senha-atual-guiche small {
+  display: block;
+  color: #666;
+}
+
+.senha-atual-guiche strong {
+  display: block;
+  margin: 10px 0;
+  color: var(--azul);
+  font-size: 60px;
+}
+
+.botao-chamar {
+  width: 100%;
+  min-height: 90px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--azul);
+  color: var(--branco);
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.botao-chamar:hover {
+  background: var(--azul-escuro);
+}
+
+.botao-chamar:disabled {
+  background: #aeb6c1;
+  cursor: not-allowed;
+}
+
+.acoes-atendimento {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.acoes-atendimento button,
+.botao-finalizar {
+  flex: 1;
+  min-height: 65px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--azul);
+  color: var(--branco);
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.acoes-atendimento button:hover,
+.botao-finalizar:hover {
+  background: var(--azul-escuro);
+}
+
+.botao-finalizar {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* =========================
+   PAINEL PÚBLICO
+========================= */
+
+.painel-publico {
+  width: 94%;
+  max-width: 1200px;
+  min-height: calc(100vh - 58px);
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.topo-painel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  border-radius: 18px;
+  background: var(--branco);
+  border-top: 7px solid var(--azul);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.topo-painel strong {
+  display: block;
+  color: var(--azul);
+  font-size: 30px;
+}
+
+.topo-painel span {
+  color: #666;
+}
+
+.status-painel {
+  padding: 12px 20px;
+  border-radius: 20px;
+  background: #eef7f0;
+  color: #26733d;
+  font-weight: bold;
+}
+
+/* CHAMADA ATUAL */
+
+.chamada-atual {
+  margin-top: 35px;
+  padding: 45px;
+  border-radius: 25px;
+  background: var(--azul-escuro);
+  color: var(--branco);
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.chamada-atual span {
+  font-size: 22px;
+}
+
+.chamada-atual strong {
+  display: block;
+  margin: 15px 0;
+  font-size: 100px;
+  letter-spacing: 4px;
+}
+
+.chamada-atual p {
+  margin: 0;
+  font-size: 20px;
+}
+
+/* HISTÓRICO */
+
+.historico-painel {
+  margin-top: 30px;
+  padding: 30px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.historico-painel h2 {
+  margin-top: 0;
+  color: var(--azul-escuro);
+}
+
+.senhas-painel-publico {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.senha-painel-publico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px;
+  min-height: 70px;
+  padding: 12px 25px;
+  border-radius: 30px;
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+  font-size: 25px;
+  font-weight: bold;
+}
+
+/* =========================
+   RODAPÉ DO TOTEM
+========================= */
+
+.rodape {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.rodape button {
+  padding: 14px 24px;
+  border: 2px solid var(--azul);
+  border-radius: 30px;
+  background: var(--branco);
+  color: var(--azul);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 750px) {
+  .totem,
+  .guiche,
+  .painel-publico {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .topo,
+  .topo-guiche,
+  .topo-painel {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .grade-opcoes {
+    grid-template-columns: 1fr;
+  }
+
+  .grade-opcoes .retirada-exames {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .opcao {
+    min-height: 150px;
+  }
+
+  .acoes-atendimento {
+    flex-direction: column;
+  }
+
+  .chamada-atual strong {
+    font-size: 65px;
+  }
+}/* =========================
+   CORES DAS SENHAS NO PAINEL
+========================= */
+
+.senha-painel-publico.senha-geral {
+  background: var(--azul);
+  color: var(--branco);
+}
+
+.senha-painel-publico.senha-preferencial {
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+}
+
+.senha-painel-publico.senha-exames {
+  background: var(--vermelho);
+  color: var(--branco);
+}
+
+/* SENHA ATUAL */
+
+.chamada-atual strong.senha-geral {
+  color: var(--azul);
+}
+
+.chamada-atual strong.senha-preferencial {
+  color: var(--amarelo);
+}
+
+.chamada-atual strong.senha-exames {
+  color: #ff6b6b;
+}.guiche-chamada {
+  display: inline-block;
+  margin: 10px 0 5px;
+  padding: 10px 25px;
+  border-radius: 12px;
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+  font-size: 24px;
+  font-weight: bold;
+}
