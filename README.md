@@ -157,7 +157,7 @@ npm run dev
 |:--|:--|--|
 | Pedro Pereira | 01927476  | Scrum Master / Desenvolvedor (Back-end e Banco de Dados) |
 | Virginia Ratis | 01927477 | Desenvolvedora (Front-end) / Documentadora |
-| Rayana Brasil | 01889319 | Testadora / Documentadora |
+| Rayana Brasil | 01889319 | Testadora / Documentadora / Suporte(frontend) |
 
 **Responsabilidades**
 
