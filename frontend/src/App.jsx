@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Totem from './pages/Totem'
 import Guiche from './pages/Guiche'
 import PainelPublico from './pages/PainelPublico'
@@ -7,128 +7,166 @@ function App() {
   const [telaAtual, setTelaAtual] = useState('totem')
 
   const [senha, setSenha] = useState('')
-  const [contadorSP, setContadorSP] = useState(0)
-  const [contadorSE, setContadorSE] = useState(0)
-  const [contadorSG, setContadorSG] = useState(0)
-
   const [fila, setFila] = useState([])
   const [ultimaChamada, setUltimaChamada] = useState('')
   const [status, setStatus] = useState('')
-  const [quantidadeChamadas, setQuantidadeChamadas] = useState(0)
   const [historicoChamadas, setHistoricoChamadas] = useState([])
 
-  function gerarSenha(tipo) {
-    let numero
-    let novaSenha
+  async function gerarSenha(tipo) {
+    try {
+      const resposta = await fetch('http://localhost:3000/senhas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tipo: tipo
+        })
+      })
 
-    if (tipo === 'SP') {
-      numero = contadorSP + 1
-      setContadorSP(numero)
-      novaSenha = `SP${String(numero).padStart(3, '0')}`
+      const dados = await resposta.json()
+
+      if (!resposta.ok) {
+        alert(dados.erro)
+        return
+      }
+
+      setSenha(dados.senha)
+
+      carregarFila()
+    } catch (erro) {
+      console.error(erro)
+      alert('Não foi possível conectar ao servidor.')
     }
-
-    if (tipo === 'SE') {
-      numero = contadorSE + 1
-      setContadorSE(numero)
-      novaSenha = `SE${String(numero).padStart(3, '0')}`
-    }
-
-    if (tipo === 'SG') {
-      numero = contadorSG + 1
-      setContadorSG(numero)
-      novaSenha = `SG${String(numero).padStart(3, '0')}`
-    }
-
-    setSenha(novaSenha)
-
-    setFila((filaAnterior) => [
-      ...filaAnterior,
-      novaSenha
-    ])
   }
 
-  function chamarProxima() {
-    if (fila.length === 0) {
-      return
+  async function carregarFila() {
+    try {
+      const resposta = await fetch('http://localhost:3000/fila')
+      const dados = await resposta.json()
+
+      setFila(dados.fila)
+    } catch (erro) {
+      console.error(erro)
     }
+  }
 
-    let senhaParaChamar = null
+  useEffect(() => {
+    carregarFila()
+  }, [])
 
-    const filaSP = fila.find((senha) =>
-      senha.startsWith('SP')
-    )
-
-    const filaSE = fila.find((senha) =>
-      senha.startsWith('SE')
-    )
-
-    const filaSG = fila.find((senha) =>
-      senha.startsWith('SG')
-    )
-
-    // Chamadas pares: SP
-    if (quantidadeChamadas % 2 === 0) {
-      if (filaSP) {
-        senhaParaChamar = filaSP
-      }
-    }
-
-    // Chamadas ímpares: SE ou SG
-    if (quantidadeChamadas % 2 !== 0) {
-      if (filaSE) {
-        senhaParaChamar = filaSE
-      } else if (filaSG) {
-        senhaParaChamar = filaSG
-      }
-    }
-
-    // Caso não exista senha do tipo esperado,
-    // chama a primeira senha disponível.
-    if (!senhaParaChamar) {
-      senhaParaChamar = fila[0]
-    }
-
-    setFila((filaAnterior) =>
-      filaAnterior.filter(
-        (senha) => senha !== senhaParaChamar
+  async function chamarProxima() {
+    try {
+      const resposta = await fetch(
+        'http://localhost:3000/fila/proxima',
+        {
+          method: 'POST'
+        }
       )
-    )
 
-    setUltimaChamada(senhaParaChamar)
+      const dados = await resposta.json()
 
-    setStatus('CHAMADA')
+      if (!resposta.ok) {
+        alert(dados.erro)
+        return
+      }
 
-    setQuantidadeChamadas(
-      (quantidadeAnterior) =>
-        quantidadeAnterior + 1
-    )
+      setFila((filaAnterior) =>
+        filaAnterior.filter(
+          (senha) => senha !== dados.senha
+        )
+      )
 
-    setHistoricoChamadas(
-      (historicoAnterior) => [
-        senhaParaChamar,
-        ...historicoAnterior
-      ].slice(0, 5)
-    )
-  }
+      setUltimaChamada(dados.senha)
+      setStatus(dados.status)
 
-  function rechamar() {
-    if (status === 'CHAMADA') {
-      setStatus('CHAMADA_NOVAMENTE')
-      return
+      setHistoricoChamadas(
+        (historicoAnterior) => [
+          dados.senha,
+          ...historicoAnterior
+        ].slice(0, 5)
+      )
+
+    } catch (erro) {
+      console.error(erro)
+      alert('Não foi possível conectar ao servidor.')
     }
+  }
 
-    if (status === 'CHAMADA_NOVAMENTE') {
-      setStatus('NÃO_COMPARECEU')
-      setUltimaChamada('')
+  async function rechamar() {
+    try {
+      const resposta = await fetch(
+        'http://localhost:3000/fila/rechamar',
+        {
+          method: 'POST'
+        }
+      )
+
+      const dados = await resposta.json()
+
+      if (!resposta.ok) {
+        alert(dados.erro)
+        return
+      }
+
+      setStatus(dados.status)
+
+      if (dados.status === 'NÃO_COMPARECEU') {
+        setUltimaChamada('')
+      }
+
+    } catch (erro) {
+      console.error(erro)
+      alert('Não foi possível conectar ao servidor.')
     }
   }
 
-  function iniciarAtendimento() {
-    setStatus('EM_ATENDIMENTO')
+  async function iniciarAtendimento() {
+    try {
+      const resposta = await fetch(
+        'http://localhost:3000/fila/iniciar',
+        {
+          method: 'POST'
+        }
+      )
+
+      const dados = await resposta.json()
+
+      if (!resposta.ok) {
+        alert(dados.erro)
+        return
+      }
+
+      setStatus(dados.status)
+
+    } catch (erro) {
+      console.error(erro)
+      alert('Não foi possível conectar ao servidor.')
+    }
   }
 
-  function finalizarAtendimento() {
-    setStatus('ATENDIDA')
+  async function finalizarAtendimento() {
+    try {
+      const resposta = await fetch(
+        'http://localhost:3000/fila/finalizar',
+        {
+          method: 'POST'
+        }
+      )
+
+      const dados = await resposta.json()
+
+      if (!resposta.ok) {
+        alert(dados.erro)
+        return
+      }
+
+      setStatus(dados.status)
+
+    } catch (erro) {
+      console.error(erro)
+      alert('Não foi possível conectar ao servidor.')
+    }
   }
 
   return (
