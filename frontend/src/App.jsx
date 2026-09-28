@@ -3,201 +3,185 @@ import Totem from './pages/Totem'
 import Guiche from './pages/Guiche'
 import PainelPublico from './pages/PainelPublico'
 
+// Endereço base da API. Fica num só lugar — se um dia trocar de porta ou
+// domínio, só precisa trocar aqui, em vez de em cada função.
+const API = 'http://localhost:3000'
+
 function App() {
+  // Controla qual das 3 telas está visível: 'totem', 'guiche' ou 'painel'.
   const [telaAtual, setTelaAtual] = useState('totem')
 
-  const [senha, setSenha] = useState('')
-  const [fila, setFila] = useState([])
-  const [ultimaChamada, setUltimaChamada] = useState('')
-  const [status, setStatus] = useState('')
-  const [historicoChamadas, setHistoricoChamadas] = useState([])
+  // Estado compartilhado entre as telas, vindo do backend.
+  const [senha, setSenha] = useState('')                      // última senha emitida (Totem)
+  const [fila, setFila] = useState([])                        // lista de códigos aguardando (Guichê)
+  const [ultimaChamada, setUltimaChamada] = useState('')      // senha em atendimento agora
+  const [status, setStatus] = useState('')                    // status da senha em atendimento
+  const [historicoChamadas, setHistoricoChamadas] = useState([]) // últimas 5 chamadas (Painel)
 
-  async function gerarSenha(tipo) {
+  // ==========================================
+  // FUNÇÕES DE APOIO PARA CHAMAR A API
+  // ==========================================
+
+  // GET — usada para carregar dados na tela. Se falhar, só loga no console
+  // e não atualiza nada (comportamento igual ao original: falha silenciosa).
+  async function buscar(rota) {
     try {
-      const resposta = await fetch('http://localhost:3000/senhas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          tipo: tipo
-        })
-      })
+      const resposta = await fetch(`${API}${rota}`)
+      const dados = await resposta.json()
+      return resposta.ok ? dados : null
+    } catch (erro) {
+      console.error(erro)
+      return null
+    }
+  }
 
+  // POST — usada pelas ações do atendente/totem. Se a API recusar (erro de
+  // regra de negócio) ou a conexão falhar, mostra um alert() pro usuário.
+  async function enviar(rota, opcoes = { method: 'POST' }) {
+    try {
+      const resposta = await fetch(`${API}${rota}`, opcoes)
       const dados = await resposta.json()
 
       if (!resposta.ok) {
         alert(dados.erro)
-        return
+        return null
       }
 
-      setSenha(dados.senha)
-
-      carregarFila()
+      return dados
     } catch (erro) {
       console.error(erro)
       alert('Não foi possível conectar ao servidor.')
+      return null
     }
   }
 
-  async function carregarFila() {
-    try {
-      const resposta = await fetch('http://localhost:3000/fila')
-      const dados = await resposta.json()
+  // ==========================================
+  // CARREGAMENTO DE DADOS (GET)
+  // ==========================================
 
-      setFila(dados.fila)
-    } catch (erro) {
-      console.error(erro)
+  async function carregarFila() {
+    const dados = await buscar('/fila')
+    if (dados) setFila(dados.fila)
+  }
+
+  async function carregarUltimaSenha() {
+    const dados = await buscar('/senhas/ultima')
+    if (dados?.senha) setSenha(dados.senha)
+  }
+
+  async function carregarAtendimentoAtual() {
+    const dados = await buscar('/fila/atendimento-atual')
+    if (!dados) return
+
+    if (dados.atendimento) {
+      setUltimaChamada(dados.atendimento.codigo)
+      setStatus(dados.atendimento.status)
+    } else {
+      setUltimaChamada('')
+      setStatus('')
     }
+  }
+
+  async function carregarHistorico() {
+    const dados = await buscar('/fila/historico')
+    if (dados) setHistoricoChamadas(dados.historico)
+  }
+
+  async function carregarEstado() {
+    await Promise.all([
+      carregarFila(),
+      carregarUltimaSenha(),
+      carregarAtendimentoAtual(),
+      carregarHistorico()
+    ])
   }
 
   useEffect(() => {
-    carregarFila()
+    carregarEstado()
   }, [])
 
+  // ==========================================
+  // AÇÕES (POST)
+  // ==========================================
+
+  async function gerarSenha(tipo) {
+    const dados = await enviar('/senhas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo })
+    })
+
+    if (!dados) return
+
+    setSenha(dados.senha)
+    await carregarFila()
+  }
+
   async function chamarProxima() {
-    try {
-      const resposta = await fetch(
-        'http://localhost:3000/fila/proxima',
-        {
-          method: 'POST'
-        }
-      )
+    const dados = await enviar('/fila/proxima')
+    if (!dados) return
 
-      const dados = await resposta.json()
+    setUltimaChamada(dados.senha)
+    setStatus(dados.status)
 
-      if (!resposta.ok) {
-        alert(dados.erro)
-        return
-      }
-
-      setFila((filaAnterior) =>
-        filaAnterior.filter(
-          (senha) => senha !== dados.senha
-        )
-      )
-
-      setUltimaChamada(dados.senha)
-      setStatus(dados.status)
-
-      setHistoricoChamadas(
-        (historicoAnterior) => [
-          dados.senha,
-          ...historicoAnterior
-        ].slice(0, 5)
-      )
-
-    } catch (erro) {
-      console.error(erro)
-      alert('Não foi possível conectar ao servidor.')
-    }
+    await Promise.all([
+      carregarFila(),
+      carregarAtendimentoAtual(),
+      carregarHistorico()
+    ])
   }
 
   async function rechamar() {
-    try {
-      const resposta = await fetch(
-        'http://localhost:3000/fila/rechamar',
-        {
-          method: 'POST'
-        }
-      )
+    const dados = await enviar('/fila/rechamar')
+    if (!dados) return
 
-      const dados = await resposta.json()
+    setStatus(dados.status)
 
-      if (!resposta.ok) {
-        alert(dados.erro)
-        return
-      }
-
-      setStatus(dados.status)
-
-      if (dados.status === 'NÃO_COMPARECEU') {
-        setUltimaChamada('')
-      }
-
-    } catch (erro) {
-      console.error(erro)
-      alert('Não foi possível conectar ao servidor.')
+    if (dados.status === 'NÃO COMPARECEU') {
+      setUltimaChamada('')
     }
+
+    await Promise.all([
+      carregarAtendimentoAtual(),
+      carregarHistorico()
+    ])
   }
 
   async function iniciarAtendimento() {
-    try {
-      const resposta = await fetch(
-        'http://localhost:3000/fila/iniciar',
-        {
-          method: 'POST'
-        }
-      )
+    const dados = await enviar('/fila/iniciar')
+    if (!dados) return
 
-      const dados = await resposta.json()
-
-      if (!resposta.ok) {
-        alert(dados.erro)
-        return
-      }
-
-      setStatus(dados.status)
-
-    } catch (erro) {
-      console.error(erro)
-      alert('Não foi possível conectar ao servidor.')
-    }
+    setStatus(dados.status)
+    await carregarAtendimentoAtual()
   }
 
   async function finalizarAtendimento() {
-    try {
-      const resposta = await fetch(
-        'http://localhost:3000/fila/finalizar',
-        {
-          method: 'POST'
-        }
-      )
+    const dados = await enviar('/fila/finalizar')
+    if (!dados) return
 
-      const dados = await resposta.json()
+    setStatus(dados.status)
+    setUltimaChamada('')
 
-      if (!resposta.ok) {
-        alert(dados.erro)
-        return
-      }
-
-      setStatus(dados.status)
-
-    } catch (erro) {
-      console.error(erro)
-      alert('Não foi possível conectar ao servidor.')
-    }
+    await Promise.all([
+      carregarAtendimentoAtual(),
+      carregarHistorico()
+    ])
   }
+
+  // ==========================================
+  // TELAS
+  // ==========================================
 
   return (
     <>
       <nav className="navegacao-telas">
-
-        <button
-          onClick={() => setTelaAtual('totem')}
-        >
-          TOTEM
-        </button>
-
-        <button
-          onClick={() => setTelaAtual('guiche')}
-        >
-          GUICHÊ
-        </button>
-
-        <button
-          onClick={() => setTelaAtual('painel')}
-        >
-          PAINEL
-        </button>
-
+        <button onClick={() => setTelaAtual('totem')}>TOTEM</button>
+        <button onClick={() => setTelaAtual('guiche')}>GUICHÊ</button>
+        <button onClick={() => setTelaAtual('painel')}>PAINEL</button>
       </nav>
 
       {telaAtual === 'totem' && (
-        <Totem
-          gerarSenha={gerarSenha}
-          senha={senha}
-        />
+        <Totem gerarSenha={gerarSenha} senha={senha} />
       )}
 
       {telaAtual === 'guiche' && (
@@ -218,7 +202,6 @@ function App() {
           historicoChamadas={historicoChamadas}
         />
       )}
-
     </>
   )
 }
